@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field, PositiveInt, validator
+from pydantic import BaseModel, Field, PositiveInt
 
 
 class CharityProjectCreate(BaseModel):
@@ -8,9 +9,16 @@ class CharityProjectCreate(BaseModel):
     description: str = Field(..., min_length=1)
     full_amount: PositiveInt = Field(...)
 
-    # @validator('full_amount')
-    # def check_full_amount_bigger_than_null(cls, value):
-    #     if value <= 0:
-    #         raise ValueError('Tребуемая сумма должна быть больше 0')
 
-    #     return value
+class CharityProjectDB(BaseModel):
+    id: int
+    name: str = Field(..., min_length=1, max_length=100)
+    description: str = Field(..., min_length=1)
+    full_amount: PositiveInt = Field(...)
+    invested_amount: int = Field(default=0)
+    fully_invested: bool = Field(default=False)
+    create_date: datetime = Field(default_factory=datetime.utcnow)
+    close_date: Optional[datetime]
+
+    class Config:
+        orm_mode = True

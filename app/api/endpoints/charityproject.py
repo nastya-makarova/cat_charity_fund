@@ -5,13 +5,17 @@ from app.crud.charityproject import (
     get_project_id_by_name
 )
 
-from app.schemas.charityproject import CharityProjectCreate
+from app.schemas.charityproject import CharityProjectCreate, CharityProjectDB
 
 
 router = APIRouter()
 
 
-@router.post('/charity_project/')
+@router.post(
+    '/charity_project/',
+    response_model=CharityProjectDB,
+    response_model_exclude_none=True,
+)
 async def create_new_charity_project(
     charity_project: CharityProjectCreate,
 ):
