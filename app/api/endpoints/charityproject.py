@@ -11,11 +11,14 @@ from app.crud.charityproject import (
 from app.schemas.charityproject import CharityProjectCreate, CharityProjectDB
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/charity_project',
+    tags=['Charity Projects']
+)
 
 
 @router.post(
-    '/charity_project/',
+    '/',
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
 )
@@ -34,7 +37,7 @@ async def create_new_charity_project(
 
 
 @router.get(
-    '/charity_project/',
+    '/',
     response_model=list[CharityProjectDB],
     response_model_exclude_none=True,
 )
