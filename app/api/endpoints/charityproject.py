@@ -3,14 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
-from app.crud.charityproject import (
-    create_charity_project,
-    delete_project,
-    get_project_by_id,
-    get_project_id_by_name,
-    read_all_projects,
-    update_charity_project
-)
+from app.crud.charityproject import charity_project_crud
 from app.models.charityproject import CharityProject
 from app.schemas.charityproject import CharityProjectCreate, CharityProjectDB, CharityProjectUpdate
 
@@ -25,7 +18,7 @@ async def check_name_duplicate(
     project_name: str,
     session: AsyncSession,
 ) -> None:
-    project_id = await get_project_id_by_name(project_name, session)
+    project_id = await charity_project_crud.get_project_id_by_name(project_name, session)
     if project_id is not None:
         raise HTTPException(
             status_code=400,
@@ -37,7 +30,7 @@ async def check_project_exist(
     project_id: int,
     session: AsyncSession
 ) -> CharityProject:
-    project = await get_project_by_id(
+    project = await charity_project_crud.get(
         project_id, session
     )
     if project is None:
@@ -58,7 +51,7 @@ async def create_new_charity_project(
     session: AsyncSession = Depends(get_async_session),
 ):
     await check_name_duplicate(charity_project.name, session)
-    new_project = await create_charity_project(charity_project, session)
+    new_project = await charity_project_crud.create(charity_project, session)
     return new_project
 
 
@@ -70,7 +63,7 @@ async def create_new_charity_project(
 async def get_all_projects(
     session: AsyncSession = Depends(get_async_session),
 ):
-    all_projects = await read_all_projects(session)
+    all_projects = await charity_project_crud.get_multi(session)
     return all_projects
 
 
@@ -91,7 +84,7 @@ async def partially_update_project(
     if obj_in.name is not None:
         await check_name_duplicate(obj_in.name, session)
 
-    project = await update_charity_project(
+    project = await charity_project_crud.update(
         project, obj_in, session
     )
     return project
@@ -109,7 +102,7 @@ async def remove_project(
     project = await check_project_exist(
         project_id, session
     )
-    project = await delete_project(
+    project = await charity_project_crud.remove(
         project, session
     )
     return project
