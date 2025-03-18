@@ -5,7 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_async_session
 from app.crud.charityproject import (
     create_charity_project,
-    get_project_id_by_name
+    get_project_id_by_name,
+    read_all_projects
 )
 from app.schemas.charityproject import CharityProjectCreate, CharityProjectDB
 
@@ -31,3 +32,14 @@ async def create_new_charity_project(
     new_project = await create_charity_project(charity_project, session)
     return new_project
 
+
+@router.get(
+    '/charity_project/',
+    response_model=list[CharityProjectDB],
+    response_model_exclude_none=True,
+)
+async def get_all_projects(
+    session: AsyncSession = Depends(get_async_session),
+):
+    all_projects = await read_all_projects(session)
+    return all_projects
