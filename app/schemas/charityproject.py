@@ -11,11 +11,11 @@ class CharityProjectCreate(BaseModel):
 
 
 class CharityProjectUpdate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=100)
-    description: str = Field(..., min_length=1)
-    full_amount: PositiveInt = Field(...)
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    description: Optional[str] = Field(None, min_length=1)
+    full_amount: Optional[PositiveInt]
 
-    @validator
+    @validator('name')
     def name_cannot_be_null(cls, value):
         if value is None:
             raise ValueError('Имя проекта не может быть пустым!')

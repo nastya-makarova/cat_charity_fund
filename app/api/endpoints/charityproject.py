@@ -5,11 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_async_session
 from app.crud.charityproject import (
     create_charity_project,
+    delete_project,
     get_project_by_id,
     get_project_id_by_name,
     read_all_projects,
     update_charity_project
 )
+from app.models.charityproject import CharityProject
 from app.schemas.charityproject import CharityProjectCreate, CharityProjectDB, CharityProjectUpdate
 
 
@@ -29,6 +31,21 @@ async def check_name_duplicate(
             status_code=400,
             detail='Проект с таким именем уже существует!'
         )
+
+
+async def check_project_exist(
+    project_id: int,
+    session: AsyncSession
+) -> CharityProject:
+    project = await get_project_by_id(
+        project_id, session
+    )
+    if project is None:
+        raise HTTPException(
+            status_code=404,
+            detail='Пороект не найден'
+        )
+    return project
 
 
 @router.post(
@@ -67,14 +84,9 @@ async def partially_update_project(
     obj_in: CharityProjectUpdate,
     session: AsyncSession = Depends(get_async_session)
 ):
-    project = await get_project_by_id(
+    project = await check_project_exist(
         project_id, session
     )
-    if project is None:
-        raise HTTPException(
-            status_code=404,
-            detail='Пороект не найден'
-        )
 
     if obj_in.name is not None:
         await check_name_duplicate(obj_in.name, session)
@@ -84,3 +96,20 @@ async def partially_update_project(
     )
     return project
 
+
+@router.delete(
+    '/{project_id}',
+    response_model=CharityProjectDB,
+    response_model_exclude_none=True,
+)
+async def remove_project(
+    project_id: int,
+    session: AsyncSession = Depends(get_async_session),
+):
+    project = await check_project_exist(
+        project_id, session
+    )
+    project = await delete_project(
+        project, session
+    )
+    return project
