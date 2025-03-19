@@ -8,10 +8,7 @@ from app.models.charityproject import CharityProject
 from app.schemas.charityproject import CharityProjectCreate, CharityProjectDB, CharityProjectUpdate
 
 
-router = APIRouter(
-    prefix='/charity_project',
-    tags=['Charity Projects']
-)
+router = APIRouter()
 
 
 async def check_name_duplicate(

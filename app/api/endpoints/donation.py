@@ -1,7 +1,4 @@
 from fastapi import APIRouter
 
 
-router = APIRouter(
-    prefix='/donation',
-    tags=['Donation']
-)
+router = APIRouter()
