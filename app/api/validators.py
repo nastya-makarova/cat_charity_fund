@@ -61,7 +61,10 @@ async def check_full_amount_to_update(
     if obj_in.full_amount < project.invested_amount:
         raise HTTPException(
             status_code=400,
-            detail='Нелья установить значение full_amount меньше уже вложенной суммы.'
+            detail=(
+                'Нелья установить значение full_amount'
+                'меньше уже вложенной суммы.'
+            )
         )
     return project
 

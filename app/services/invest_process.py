@@ -10,7 +10,7 @@ async def investment_process(
     session: AsyncSession,
 ):
     available_list = await session.execute(select(model).where(
-        model.fully_invested == False
+        model.fully_invested.is_(False)
     ).order_by(model.create_date))
 
     available_list = available_list.scalars().all()
