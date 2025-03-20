@@ -13,11 +13,6 @@ class PreBase:
         return cls.__name__.lower()
 
     id = Column(Integer, primary_key=True)
-    full_amount = Column(Integer)
-    invested_amount = Column(Integer, default=0)
-    fully_invested = Column(Boolean, default=False)
-    create_date = Column(DateTime, nullable=False, default=datetime.utcnow)
-    close_date = Column(DateTime)
 
 
 Base = declarative_base(cls=PreBase)
@@ -25,6 +20,16 @@ Base = declarative_base(cls=PreBase)
 engine = create_async_engine(settings.database_url)
 
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession)
+
+
+class ProjectDonationBase(Base):
+    __abstract__ = True
+
+    full_amount = Column(Integer)
+    invested_amount = Column(Integer, default=0)
+    fully_invested = Column(Boolean, default=False)
+    create_date = Column(DateTime, nullable=False, default=datetime.utcnow)
+    close_date = Column(DateTime)
 
 
 async def get_async_session():

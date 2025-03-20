@@ -12,7 +12,6 @@ class DonationCreate(BaseModel):
 class DonationDb(DonationCreate):
     id: int
     create_date: datetime = Field(default_factory=datetime.utcnow)
-    close_date: Optional[datetime]
 
     class Config:
         orm_mode = True
@@ -23,3 +22,4 @@ class DonationDbFull(DonationDb):
     user_id: Optional[int]
     invested_amount: int
     fully_invested: bool
+    close_date: Optional[datetime]
