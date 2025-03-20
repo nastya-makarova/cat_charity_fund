@@ -37,8 +37,13 @@ async def create_new_donation(
     session: AsyncSession = Depends(get_async_session),
     user: User = Depends(current_user),
 ):
+    """Для авторизированных пользователей."""
     new_donation = await donation_crud.create(donation, session, user)
-    await investment_process(session=session, new_item=new_donation, model=CharityProject)
+    await investment_process(
+        session=session,
+        new_item=new_donation,
+        model=CharityProject
+    )
     return new_donation
 
 

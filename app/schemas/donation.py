@@ -9,10 +9,8 @@ class DonationCreate(BaseModel):
     comment: Optional[str]
 
 
-class DonationDb(BaseModel):
+class DonationDb(DonationCreate):
     id: int
-    full_amount: PositiveInt = Field(...)
-    comment: Optional[str]
     create_date: datetime = Field(default_factory=datetime.utcnow)
     close_date: Optional[datetime]
 
@@ -20,15 +18,8 @@ class DonationDb(BaseModel):
         orm_mode = True
 
 
-class DonationDbFull(BaseModel):
+class DonationDbFull(DonationDb):
     id: int
     user_id: Optional[int]
-    full_amount: PositiveInt = Field(...)
-    comment: Optional[str]
     invested_amount: int
     fully_invested: bool
-    create_date: datetime = Field(default_factory=datetime.utcnow)
-    close_date: Optional[datetime]
-
-    class Config:
-        orm_mode = True

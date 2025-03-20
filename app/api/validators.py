@@ -10,7 +10,9 @@ async def check_name_duplicate(
     project_name: str,
     session: AsyncSession,
 ) -> None:
-    project_id = await charity_project_crud.get_project_id_by_name(project_name, session)
+    project_id = await charity_project_crud.get_project_id_by_name(
+        project_name, session
+    )
     if project_id is not None:
         raise HTTPException(
             status_code=400,
@@ -77,10 +79,3 @@ async def check_closed_projects(
             detail='Нелья изменять закрытые проекты.'
         )
     return project
-
-
-# async def check_forbidden_fields(
-#     obj_in: CharityProjectUpdate,
-#     session: AsyncSession
-# ):
-#     if 

@@ -12,7 +12,10 @@ from app.core.user import current_superuser
 from app.crud.charityproject import charity_project_crud
 from app.models import Donation
 from app.services.invest_process import investment_process
-from app.schemas.charityproject import CharityProjectCreate, CharityProjectDB, CharityProjectUpdate
+from app.schemas.charityproject import (
+    CharityProjectCreate,
+    CharityProjectDB,
+    CharityProjectUpdate)
 
 
 router = APIRouter()
@@ -31,7 +34,11 @@ async def create_new_charity_project(
     """Только для суперюзеров."""
     await check_name_duplicate(charity_project.name, session)
     new_project = await charity_project_crud.create(charity_project, session)
-    await investment_process(session=session, new_item=new_project, model=Donation)
+    await investment_process(
+        session=session,
+        new_item=new_project,
+        model=Donation
+    )
     return new_project
 
 
