@@ -39,3 +39,19 @@ async def create_new_donation(
     new_donation = await donation_crud.create(donation, session, user)
     return new_donation
 
+
+@router.get(
+    '/my',
+    response_model=list[DonationDb],
+    response_model_exclude_none=True,
+)
+async def get_my_donations(
+    session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(current_user)
+):
+    """Получает список всех пожертвований для текущего пользователя."""
+    donations = await donation_crud.get_by_user(
+        session=session, user=user
+    )
+    return donations
+
