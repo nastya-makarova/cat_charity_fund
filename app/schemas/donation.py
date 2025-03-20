@@ -18,3 +18,17 @@ class DonationDb(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class DonationDbFull(BaseModel):
+    id: int
+    user_id: Optional[int]
+    full_amount: PositiveInt = Field(...)
+    comment: Optional[str]
+    invested_amount: int
+    fully_invested: bool
+    create_date: datetime = Field(default_factory=datetime.utcnow)
+    close_date: Optional[datetime]
+
+    class Config:
+        orm_mode = True
