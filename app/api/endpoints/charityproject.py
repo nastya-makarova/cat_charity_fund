@@ -10,7 +10,7 @@ from app.api.validators import (
 from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud.charityproject import charity_project_crud
-from app.models import CharityProject
+from app.models import Donation
 from app.services.invest_process import investment_process
 from app.schemas.charityproject import CharityProjectCreate, CharityProjectDB, CharityProjectUpdate
 
@@ -31,7 +31,7 @@ async def create_new_charity_project(
     """Только для суперюзеров."""
     await check_name_duplicate(charity_project.name, session)
     new_project = await charity_project_crud.create(charity_project, session)
-    await investment_process(session=session, new_item=new_project, model=CharityProject)
+    await investment_process(session=session, new_item=new_project, model=Donation)
     return new_project
 
 
@@ -65,9 +65,10 @@ async def partially_update_project(
 
     await check_closed_projects(project_id, session)
 
-    await check_full_amount_to_update(
-        obj_in, project_id, session
-    )
+    if obj_in.full_amount:
+        await check_full_amount_to_update(
+            obj_in, project_id, session
+        )
 
     if obj_in.name is not None:
         await check_name_duplicate(obj_in.name, session)

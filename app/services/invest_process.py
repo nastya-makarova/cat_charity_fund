@@ -3,8 +3,6 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import CharityProject, Donation
-
 
 async def investment_process(
     new_item,
@@ -32,7 +30,7 @@ async def investment_process(
         if new_item.invested_amount == new_item.full_amount:
             new_item.fully_invested = True
             new_item.close_date = datetime.now()
-            break
+
         if element.invested_amount == element.full_amount:
             element.fully_invested = True
             element.close_date = datetime.now()
