@@ -10,6 +10,8 @@ from app.api.validators import (
 from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud.charityproject import charity_project_crud
+from app.models import CharityProject
+from app.services.invest_process import investment_process
 from app.schemas.charityproject import CharityProjectCreate, CharityProjectDB, CharityProjectUpdate
 
 
@@ -29,6 +31,7 @@ async def create_new_charity_project(
     """Только для суперюзеров."""
     await check_name_duplicate(charity_project.name, session)
     new_project = await charity_project_crud.create(charity_project, session)
+    await investment_process(session=session, new_item=new_project, model=CharityProject)
     return new_project
 
 
