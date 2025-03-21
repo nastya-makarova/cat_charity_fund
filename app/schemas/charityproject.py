@@ -3,16 +3,22 @@ from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, PositiveInt, validator
 
+from app.core.constants import DEFAULT_INVESTED_AMOUNT, MAX_LENGTH, MIN_LENGTH
+
 
 class CharityProjectCreate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=100)
-    description: str = Field(..., min_length=1)
+    name: str = Field(..., min_length=MIN_LENGTH, max_length=MAX_LENGTH)
+    description: str = Field(..., min_length=MIN_LENGTH)
     full_amount: PositiveInt = Field(...)
 
 
 class CharityProjectUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=1, max_length=100)
-    description: Optional[str] = Field(None, min_length=1)
+    name: Optional[str] = Field(
+        None,
+        min_length=MIN_LENGTH,
+        max_length=MAX_LENGTH
+    )
+    description: Optional[str] = Field(None, min_length=MIN_LENGTH)
     full_amount: Optional[PositiveInt]
 
     @validator('name')
@@ -27,7 +33,7 @@ class CharityProjectUpdate(BaseModel):
 
 class CharityProjectDB(CharityProjectCreate):
     id: int
-    invested_amount: int = Field(default=0)
+    invested_amount: int = Field(default=DEFAULT_INVESTED_AMOUNT)
     fully_invested: bool = Field(default=False)
     create_date: datetime = Field(default_factory=datetime.utcnow)
     close_date: Optional[datetime]

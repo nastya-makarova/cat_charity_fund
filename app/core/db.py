@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, declared_attr, sessionmaker
 
 from app.core.config import settings
+from app.core.constants import DEFAULT_INVESTED_AMOUNT
 
 
 class PreBase:
@@ -26,7 +27,7 @@ class ProjectDonationBase(Base):
     __abstract__ = True
 
     full_amount = Column(Integer)
-    invested_amount = Column(Integer, default=0)
+    invested_amount = Column(Integer, default=DEFAULT_INVESTED_AMOUNT)
     fully_invested = Column(Boolean, default=False)
     create_date = Column(DateTime, nullable=False, default=datetime.utcnow)
     close_date = Column(DateTime)
