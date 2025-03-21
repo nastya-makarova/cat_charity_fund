@@ -11,7 +11,7 @@ from app.api.validators import (
 from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud.charityproject import charity_project_crud
-from app.models import Donation
+from app.crud.donation import donation_crud
 from app.schemas.charityproject import (
     CharityProjectCreate,
     CharityProjectDB,
@@ -34,13 +34,17 @@ async def create_new_charity_project(
 ):
     """Только для суперюзеров."""
     await check_name_duplicate(charity_project.name, session)
+
     new_project = await charity_project_crud.create(charity_project, session)
-    await investment_process(
-        session=session,
-        new_item=new_project,
-        model=Donation
+    available_donations = await donation_crud.get_not_closed_objects(session)
+
+    updated_project, updated_donations = investment_process(
+        new_item=new_project, objects=available_donations
     )
-    return new_project
+    await charity_project_crud.save_investing_updates(
+        new_item=updated_project, objects=updated_donations, session=session
+    )
+    return updated_project
 
 
 @router.get(

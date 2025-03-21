@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
 from app.core.user import current_superuser, current_user
+from app.crud.charityproject import charity_project_crud
 from app.crud.donation import donation_crud
 from app.models import CharityProject, User
 from app.schemas.donation import DonationCreate, DonationDb, DonationDbFull
@@ -37,12 +38,18 @@ async def create_new_donation(
 ):
     """Для авторизированных пользователей."""
     new_donation = await donation_crud.create(donation, session, user)
-    await investment_process(
-        session=session,
-        new_item=new_donation,
-        model=CharityProject
+    available_projects = await charity_project_crud.get_not_closed_objects(
+        session
     )
-    return new_donation
+
+    updated_donation, updated_projects = investment_process(
+        new_item=new_donation, objects=available_projects
+    )
+
+    await donation_crud.save_investing_updates(
+        new_item=updated_donation, objects=updated_projects, session=session
+    )
+    return updated_donation
 
 
 @router.get(
