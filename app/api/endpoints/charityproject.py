@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,7 +13,7 @@ from app.api.validators import (
 from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud.charityproject import charity_project_crud
-from app.models import Donation
+from app.crud.donation import donation_crud
 from app.schemas.charityproject import (
     CharityProjectCreate,
     CharityProjectDB,
@@ -34,13 +36,17 @@ async def create_new_charity_project(
 ):
     """Только для суперюзеров."""
     await check_name_duplicate(charity_project.name, session)
+
     new_project = await charity_project_crud.create(charity_project, session)
-    await investment_process(
-        session=session,
-        new_item=new_project,
-        model=Donation
+    available_donations = await donation_crud.get_not_closed_objects(session)
+
+    updated_project, updated_donations = investment_process(
+        new_item=new_project, objects=available_donations
     )
-    return new_project
+    await charity_project_crud.save_investing_updates(
+        new_item=updated_project, objects=updated_donations, session=session
+    )
+    return updated_project
 
 
 @router.get(
@@ -51,8 +57,7 @@ async def create_new_charity_project(
 async def get_all_projects(
     session: AsyncSession = Depends(get_async_session),
 ):
-    all_projects = await charity_project_crud.get_multi(session)
-    return all_projects
+    return await charity_project_crud.get_multi(session)
 
 
 @router.patch(
@@ -74,6 +79,9 @@ async def partially_update_project(
     await check_closed_projects(project_id, session)
 
     if obj_in.full_amount:
+        if obj_in.full_amount == project.invested_amount:
+            project.close_date = datetime.now()
+            project.fully_invested = True
         await check_full_amount_to_update(
             obj_in, project_id, session
         )
@@ -81,10 +89,9 @@ async def partially_update_project(
     if obj_in.name is not None:
         await check_name_duplicate(obj_in.name, session)
 
-    project = await charity_project_crud.update(
+    return await charity_project_crud.update(
         project, obj_in, session
     )
-    return project
 
 
 @router.delete(
@@ -103,7 +110,6 @@ async def remove_project(
     )
     await check_for_delete(project_id, session)
 
-    project = await charity_project_crud.remove(
+    return await charity_project_crud.remove(
         project, session
     )
-    return project

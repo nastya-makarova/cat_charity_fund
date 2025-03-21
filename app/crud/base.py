@@ -72,3 +72,28 @@ class CRUDBase:
         await session.delete(db_obj)
         await session.commit()
         return db_obj
+
+    async def get_not_closed_objects(
+        self,
+        session: AsyncSession,
+    ):
+        objects = await session.execute(select(self.model).where(
+            self.model.fully_invested.is_(False)
+        ).order_by(self.model.create_date))
+
+        if not objects:
+            return
+
+        return objects.scalars().all()
+
+    async def save_investing_updates(
+        self,
+        new_item,
+        objects,
+        session: AsyncSession
+    ):
+        session.add(new_item)
+        for obj in objects:
+            session.add(obj)
+        await session.commit()
+        await session.refresh(new_item)
