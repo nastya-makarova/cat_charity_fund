@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -77,6 +79,9 @@ async def partially_update_project(
     await check_closed_projects(project_id, session)
 
     if obj_in.full_amount:
+        if obj_in.full_amount == project.invested_amount:
+            project.close_date = datetime.now()
+            project.fully_invested = True
         await check_full_amount_to_update(
             obj_in, project_id, session
         )
