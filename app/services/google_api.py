@@ -1,4 +1,4 @@
-from datetime  import datetime
+from datetime  import datetime, timedelta
 
 from aiogoogle import Aiogoogle
 
@@ -56,9 +56,10 @@ async def spreadsheets_update_value(
         ['Названия проекта', 'Время сбора', 'Описание']
     ]
     for project in projects:
+        format_time_diff = timedelta(days=project['time_diff'])
         new_row = [
             str(project['name']),
-            str(project['time_diff']),
+            str(format_time_diff),
             str(project['description'])
         ]
         table_values.append(new_row)
