@@ -30,7 +30,7 @@ class CRUDCharityProject(CRUDBase):
             func.julianday(CharityProject.create_date)
         ).label('time_diff')
         projects = await session.execute(
-            select(CharityProject, time_to_complete).where(
+            select(CharityProject.name, time_to_complete, CharityProject.description).where(
                 CharityProject.fully_invested == 1
             ).order_by(time_to_complete)
         )
