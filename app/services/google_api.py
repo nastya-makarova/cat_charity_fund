@@ -56,6 +56,7 @@ async def spreadsheets_update_value(
         ['Названия проекта', 'Время сбора', 'Описание']
     ]
     for project in projects:
+        print(project['time_diff'])
         format_time_diff = timedelta(days=project['time_diff'])
         new_row = [
             str(project['name']),
