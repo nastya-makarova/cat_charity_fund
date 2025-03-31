@@ -22,7 +22,7 @@ router = APIRouter()
 async def get_report(
     session: AsyncSession = Depends(get_async_session),
     wrapper_services: Aiogoogle = Depends(get_service)
-):
+) -> list:
     """Только для суперюзеров."""
     projects = await charity_project_crud.get_projects_by_completion_rate(
         session
